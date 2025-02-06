@@ -6,3 +6,4 @@
 int finish();
 void move(char direction);
 int isDirection(char direction);
+void fanstasms();
