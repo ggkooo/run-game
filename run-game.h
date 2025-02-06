@@ -1,12 +1,8 @@
-void releaseMap();
-void readMap();
-void allocMap();
-void drawMap();
+#define TOP 'w'
+#define BOTTOM 's'
+#define RIGHT 'd'
+#define LEFT 'a'
+
 int finish();
 void move(char direction);
-
-struct map {
-	char** matriz;
-	int lines;
-	int columns;
-};
+int isDirection(char direction);

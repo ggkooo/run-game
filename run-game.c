@@ -1,93 +1,58 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "run-game.h"
+#include "map.h"
 
-struct map m;
-
-void releaseMap() {
-	for (int i = 0; i < m.lines; i++) {
-		free(m.matriz[i]);
-	}
-	free(m.matriz);
-}
-
-void readMap() {
-	FILE* file;
-	file = fopen("map.txt", "r");
-	if (file == 0) {
-		printf("Erro na leitura do mapa.\n");
-		exit(1);
-	}
-
-	fscanf(file, "%d %d", &m.lines, &m.columns);
-
-	allocMap();
-
-	for (int i = 0; i <= 4; i++) {
-		fscanf(file, "%s", m.matriz[i]);
-	}
-
-	fclose(file);
-}
-
-void allocMap() {
-	m.matriz = malloc(sizeof(char*) * m.lines);
-
-	for (int i = 0; i < m.lines; i++) {
-		m.matriz[i] = malloc(sizeof(char) * (m.columns + 1));
-	}
-}
-
-void drawMap() {
-	for (int i = 0; i <= 4; i++) {
-		printf("%s\n", m.matriz[i]);
-	}
-}
+MAP m;
+POSITION hero;
 
 int finish() {
 	return 0;
 }
 
-void move(char direction) {
-	int x;
-	int y;
+int isDirection(char direction) {
+	return direction != 'a' || direction != 's' || direction != 'd' || direction != 'w';
+}
 
-	for (int i = 0; i < m.lines; i++) {
-		for (int j = 0; j < m.columns; j++) {
-			if (m.matriz[i][j] == '@') {
-				x = i;
-				y = j; 
-				break;
-			}
-		}
-	}
+void move(char direction) {
+	if (!isDirection(direction)) return;
+
+	int nextX = hero.x;
+	int nextY = hero.y;
 
 	switch(direction) {
-		case 'a': 
-			m.matriz[x][y-1] = '@';
+		case LEFT: 
+			nextY--;
 			break;
-		case 'd':
-			m.matriz[x][y+1] = '@';
+		case RIGHT:
+			nextY++;
 			break;
-		case 's':
-			m.matriz[x+1][y] = '@';
+		case BOTTOM:
+			nextX++;
 			break;
-		case 'w':
-			m.matriz[x-1][y] = '@';
+		case TOP:
+			nextX--;
+			break;
 	}
 
-	m.matriz[x][y] = '.';
+	if (!isValid(&m, nextX, nextY)) return;
+	if (!isEmpty(&m, nextX, nextY)) return;
+
+	walkOnTheMap(&m, hero.x, hero.y, nextX, nextY);
+	hero.x = nextX;
+	hero.y = nextY;
  }
 
 int main() {
-	readMap();
+	readMap(&m);
+	findMap(&m, &hero, HERO);
 
 	do {
-		drawMap();
+		drawMap(&m);
 		char command;
 		scanf(" %c", &command);
 		move(command);
 	} while(!finish());
 
-	releaseMap();
+	releaseMap(&m);
 }
