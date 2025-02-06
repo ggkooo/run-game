@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include "map.h"
 
+void copyMap(MAP* destination, MAP* origin) {
+	destination->lines = origin->lines;
+	destination->columns = origin->columns;
+
+	allocMap(destination);
+	for (int i = 0; i < origin->lines; i++) {
+		for (int j = 0; j < origin->columns; j++) {
+			destination->matriz[i][j] = origin->matriz[i][j];
+		}
+	}
+}
+
 void walkOnTheMap(MAP* m, int originX, int originY, int newX, int newY) {
 	char hero = m->matriz[originX][originY];
 	m->matriz[newX][newY] = hero;
