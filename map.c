@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include "map.h"
 
+int isHero(MAP* m, char hero, int x, int y) {
+	return m->matriz[x][y] == hero; 
+}
+
+int isWall(MAP* m, int x, int y) {
+	return m->matriz[x][y] == VERTICAL_WALL || m->matriz[x][y] == HORIZONTAL_WALL;
+}
+
+int canWalk(MAP* m, char hero, int x, int y) {
+	return isValid(m, x, y) && !isWall(m, x, y) && !isHero(m, hero, x, y);
+}
+
 void copyMap(MAP* destination, MAP* origin) {
 	destination->lines = origin->lines;
 	destination->columns = origin->columns;
@@ -30,16 +42,17 @@ int isValid(MAP* m, int x, int y) {
 	return 1;
 }
 
-void findMap(MAP* m, POSITION* p, char c) {
+int findMap(MAP* m, POSITION* p, char c) {
 	for (int i = 0; i < m->lines; i++) {
 		for (int j = 0; j < m->columns; j++) {
 			if (m->matriz[i][j] == c) {
 				p->x = i;
 				p->y = j; 
-				break;
+				return 1;
 			}
 		}
 	}
+	return 0;
 }
 
 void releaseMap(MAP* m) {
@@ -73,11 +86,5 @@ void allocMap(MAP* m) {
 
 	for (int i = 0; i < m->lines; i++) {
 		m->matriz[i] = malloc(sizeof(char) * (m->columns + 1));
-	}
-}
-
-void drawMap(MAP* m) {
-	for (int i = 0; i <= 4; i++) {
-		printf("%s\n", m->matriz[i]);
 	}
 }
